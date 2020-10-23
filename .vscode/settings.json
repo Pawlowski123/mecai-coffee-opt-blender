@@ -1,3 +1,4 @@
 {
-    "editor.tabCompletion": "on"
+    "editor.tabCompletion": "on",
+    "python.pythonPath": "C:\\Users\\BC966HL\\Anaconda3\\python.exe"
 }
