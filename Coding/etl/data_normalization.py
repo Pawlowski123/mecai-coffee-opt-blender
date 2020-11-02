@@ -1,11 +1,29 @@
+import pandas as pd
+from pandas_profiling import ProfileReport
+import numpy as np
+import os
+import logging
+
 def data_norm():
+
+        """ CSV file input, columns and data cleansing and export to new CSV file
+    
+        Parameters
+        ----------
+        No parameters
+
+        Returns:
+        ----------
+        No returns, output a file to hardcoded path
+        """
+        
         # Working with local directory to get the correct input path
-        os.chdir('..')
-        os.chdir('Datasets/')
-        #os.getcwd()
+        #os.chdir('..')
+        #os.chdir('Datasets/')
+        logging.warning(os.getcwd())
 
         # Reading raw input CSV from Coffee Quality Institute
-        df_raw = pd.read_csv('Coffee-quality-institute.csv')
+        df_raw = pd.read_csv('Datasets/Coffee-quality-institute.csv')
         df_raw = df_raw[['ID',
                         'Species', 
                         'Country.of.Origin', 
@@ -31,11 +49,6 @@ def data_norm():
 
         logging.warning('CSV File read successfully\n')
         logging.warning('.')
-        logging.warning('..')
-        logging.warning('...')
-        logging.warning('....')
-        logging.warning('.....')
-        logging.warning('......')
 
         # Renaming columns according to friendly labels
         df_renamed = df_raw.rename(columns={'Country.of.Origin': 'ORIGIN_COUNTRY',
@@ -128,14 +141,10 @@ def data_norm():
                         ].reset_index()
 
         # Changin current directory to export on correct path
-        os.chdir('C:/Users/BC966HL/OneDrive - EY/4. Mestrado/Dev/Datasets')
+        #os.chdir('C:/Users/BC966HL/OneDrive - EY/4. Mestrado/Dev/Datasets')
 
-        df_opt.to_csv('cleaned_cqi_file.csv', sep = ';')
+        logging.warning(os.getcwd())
+        df_opt.to_csv('Datasets/cleaned_cqi_file.csv', sep = ';')
 
         logging.warning('.')
-        logging.warning('..')
-        logging.warning('...')
-        logging.warning('....')
-        logging.warning('.....')
-        logging.warning('......')
         logging.warning('Cleaned CSV file exported to path successfully')

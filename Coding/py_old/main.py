@@ -4,4 +4,6 @@ import numpy as np
 import os
 import logging
 
-import data_normalization
+import Coding
+
+data_normalization()
