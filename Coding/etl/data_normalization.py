@@ -144,7 +144,7 @@ def data_norm():
         #os.chdir('C:/Users/BC966HL/OneDrive - EY/4. Mestrado/Dev/Datasets')
 
         logging.warning(os.getcwd())
-        df_opt.to_csv('Datasets/cleaned_cqi_file.csv', sep = ';')
+        df_opt.to_csv('Datasets/etl/cleaned_cqi_file.csv', sep = ';')
 
         logging.warning('.')
         logging.warning('Cleaned CSV file exported to path successfully')
