@@ -27,7 +27,6 @@ def data_norm():
         df_raw = df_raw[['ID',
                         'Species', 
                         'Country.of.Origin', 
-                        'Lot.Number', 
                         'Altitude', 
                         'unit_of_measurement', 
                         'Number.of.Bags', 
@@ -53,7 +52,6 @@ def data_norm():
         # Renaming columns according to friendly labels
         df_renamed = df_raw.rename(columns={'Country.of.Origin': 'ORIGIN_COUNTRY',
                                         'Species': 'SPECIES',
-                                        'Lot.Number': 'LOT_NUMBER',
                                         'Altitude': 'ALTITUDE',
                                         'unit_of_measurement': 'ALTITUDE_UOM_NN',
                                         'Number.of.Bags': 'BAG_AVAILABILITY',
@@ -117,7 +115,6 @@ def data_norm():
         df_treated = df_treated.astype({'ID': int,
                                         'SPECIES': str,
                                         'ORIGIN_COUNTRY': str,
-                                        'LOT_NUMBER': str,
                                         'ALTITUDE': str,
                                         'ALTITUDE_UOM_NN': str,
                                         'AROMA': float,
