@@ -104,9 +104,7 @@ def minimize_round(df_recipe, df_available_lots, constraints, bnd):
 
         Returns:
         ----------
-        slsqp.message: output from the algorithm round
-		allocation rate: allocation rate between allocated mass and expected recipe volume
-		cost function output: result as the allocated lots production cost
+        slsqp: OptmizeResult module containing all minimize outputs
 	"""
 	# Running the Sequential Least SQuares Programming algorithm until it gets a successfull output.
 	#slsqp.status = -1
@@ -118,5 +116,6 @@ def minimize_round(df_recipe, df_available_lots, constraints, bnd):
 					constraints = constraints,
 					bounds = bnd
 				)
-
-	return slsqp.message, sum(slsqp.x)/float(df_recipe['VOLUME_NEED']), slsqp.fun**2
+	
+	return slsqp
+	#slsqp.message, sum(slsqp.x)/float(df_recipe['VOLUME_NEED']), slsqp.fun**2
