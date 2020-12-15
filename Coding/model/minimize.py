@@ -118,4 +118,50 @@ def minimize_round(df_recipe, df_available_lots, constraints, bnd):
 				)
 	
 	return slsqp
-	#slsqp.message, sum(slsqp.x)/float(df_recipe['VOLUME_NEED']), slsqp.fun**2
+
+def run_model(df_recipe, df_available_lots, constraints, bnd, times = 10):
+	""" Runs the model n times (parametrized) and returns the best solution within successfull outputs.
+        Parameters
+        ----------
+		times: number of iterations
+
+        Returns:
+        ----------
+        model_output_best: OptmizeResult module containing best successfull solution within n iterations and defined constraints
+	"""
+	best_fun = 10**10
+
+	for i in range(times):
+		model_output = minimize_round(df_recipe, df_available_lots, constraints, bnd)
+		if (model_output.fun < best_fun) & (model_output.status == 0):
+			best_fun = model_output.fun
+			model_output_best = model_output
+
+	return model_output_best
+
+def model_results(df_recipe, df_available_lots, model_output):
+	df_model_output = df_available_lots[['LOT_AVAILABILITY_KG']]
+	df_model_output['MODEL_RESULT_ARRAY'] = model_output.x.astype(int)
+
+	df_model_output['ALLOCATION_TEST'] = [True if df_model_output['MODEL_RESULT_ARRAY'][x] <= df_model_output['LOT_AVAILABILITY_KG'][x] else False for x in range(len(df_model_output['LOT_AVAILABILITY_KG']))]
+	
+	df_model_recipe_output = pd.DataFrame()
+	df_model_recipe_output['AROMA'] = [abs(float(df_recipe['AROMA']) - (sum(np.array(df_available_lots['AROMA'])*model_output.x))/sum(model_output.x))]
+
+	df_model_recipe_output['FLAVOR'] = [abs(float(df_recipe['FLAVOR']) - (sum(np.array(df_available_lots['FLAVOR'])*model_output.x))/sum(model_output.x))]
+
+	df_model_recipe_output['AFTERTASTE'] = [abs(float(df_recipe['AFTERTASTE']) - (sum(np.array(df_available_lots['AFTERTASTE'])*model_output.x))/sum(model_output.x))]
+
+	df_model_recipe_output['ACIDITY'] = [abs(float(df_recipe['ACIDITY']) - (sum(np.array(df_available_lots['ACIDITY'])*model_output.x))/sum(model_output.x))]
+
+	df_model_recipe_output['BODY'] = [abs(float(df_recipe['BODY']) - (sum(np.array(df_available_lots['BODY'])*model_output.x))/sum(model_output.x))]
+
+	df_model_recipe_output['BALANCE'] = [abs(float(df_recipe['BALANCE']) - (sum(np.array(df_available_lots['BALANCE'])*model_output.x))/sum(model_output.x))]
+
+	df_model_recipe_output['MOISTURE'] = [abs(float(df_recipe['MOISTURE']) - (sum(np.array(df_available_lots['MOISTURE'])*model_output.x))/sum(model_output.x))]
+
+	constraints_results = df_model_recipe_output
+	recipe_output = df_recipe[df_model_recipe_output.columns]
+	deviation_percentage = 100*df_model_recipe_output/df_recipe[df_model_recipe_output.columns]
+
+	return df_model_output, constraints_results, recipe_output, deviation_percentage
