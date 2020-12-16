@@ -161,7 +161,7 @@ def model_results(df_recipe, df_available_lots, model_output):
 	df_model_recipe_output['MOISTURE'] = [abs(float(df_recipe['MOISTURE']) - (sum(np.array(df_available_lots['MOISTURE'])*model_output.x))/sum(model_output.x))]
 
 	constraints_results = df_model_recipe_output
-	recipe_output = df_recipe[df_model_recipe_output.columns]
+	
 	deviation_percentage = 100*df_model_recipe_output/df_recipe[df_model_recipe_output.columns]
 
-	return df_model_output, constraints_results, recipe_output, deviation_percentage
+	return df_model_output, constraints_results, deviation_percentage
