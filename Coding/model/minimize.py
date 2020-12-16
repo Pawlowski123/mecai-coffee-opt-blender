@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from scipy.optimize import minimize, LinearConstraint, NonlinearConstraint
 import logging
+import time
 
 def model_input_read():
 	""" Model CSV file inputs. Reading both recipe and available lots CSV files.
@@ -93,7 +94,7 @@ def cost_obj_f(x, cost_per_lot):
 	return np.sqrt(sum(np.array(cost_per_lot)*x))
 
 
-def minimize_round(df_recipe, df_available_lots, constraints, bnd):
+def minimize_round(df_recipe, df_available_lots, constraints, bnd, x0, maxiter = 10):
 	""" Runs the SLSQP minimize algorithm with all defined constraints and bounds
         Parameters
         ----------
@@ -109,35 +110,39 @@ def minimize_round(df_recipe, df_available_lots, constraints, bnd):
 	# Running the Sequential Least SQuares Programming algorithm until it gets a successfull output.
 	#slsqp.status = -1
 	#while(slsqp.status != 0):
+	x0 = np.random.randint(0, 100, len(df_available_lots['COST_BRL_KG']))
+	t0 = time.perf_counter()
 	slsqp = minimize(cost_obj_f,
-					x0 = np.random.randint(0, 100, len(df_available_lots['COST_BRL_KG'])),
+					x0 = x0,
 					args = (df_available_lots['COST_BRL_KG'],),
 					method = 'SLSQP',
 					constraints = constraints,
-					bounds = bnd
+					bounds = bnd,
+					options = {'maxiter': maxiter}
 				)
-	
-	return slsqp
+	tf = time.perf_counter()
+	round_time = tf - t0
 
-def run_model(df_recipe, df_available_lots, constraints, bnd, times = 10):
-	""" Runs the model n times (parametrized) and returns the best solution within successfull outputs.
-        Parameters
-        ----------
-		times: number of iterations
+	return slsqp, {'extra_data': {'round_time': round_time, 'x0': x0}}
 
-        Returns:
-        ----------
-        model_output_best: OptmizeResult module containing best successfull solution within n iterations and defined constraints
-	"""
-	best_fun = 10**10
+def simulation_fixed_x0_var_iterations(df_recipe, df_available_lots, ub = 0.7, stop = 100, step = 10):
+    simulation_fx_x0_var_iter = {}
+    x0 = np.random.randint(0, df_available_lots['LOT_AVAILABILITY_KG'], len(df_available_lots['COST_BRL_KG']))
+    constraints, bnd = constraints_bounds(df_recipe, df_available_lots, ub = 0.7)
+    for iteration in range(1, stop, step):
+        simulation_fx_x0_var_iter[str(iteration)] = minimize_round(df_recipe, df_available_lots, constraints, bnd, x0 = x0, maxiter = iteration)
+        logging.warning('Appended iteration %d', iteration)
+    return simulation_fx_x0_var_iter
 
-	for i in range(times):
-		model_output = minimize_round(df_recipe, df_available_lots, constraints, bnd)
-		if (model_output.fun < best_fun) & (model_output.status == 0):
-			best_fun = model_output.fun
-			model_output_best = model_output
+def simulation_var_x0_fixed_iterations(df_recipe, df_available_lots, ub = 0.7, iterations = 10, model_maxiter = 100):
+    simulation_var_x0_fx_iter = {}
+    constraints, bnd = constraints_bounds(df_recipe, df_available_lots, ub = ub)
+    for iteration in range(iterations):
+        x0 = np.random.randint(0, df_available_lots['LOT_AVAILABILITY_KG'], len(df_available_lots['COST_BRL_KG']))
+        simulation_var_x0_fx_iter[str(iteration)] = minimize_round(df_recipe, df_available_lots, constraints, bnd, x0 = x0, maxiter = model_maxiter), {'x0': x0} 
+        logging.warning('Appended iteration %d', iteration)
 
-	return model_output_best
+    return simulation_var_x0_fx_iter
 
 def model_results(df_recipe, df_available_lots, model_output):
 	df_model_output = df_available_lots[['LOT_AVAILABILITY_KG']]
