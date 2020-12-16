@@ -139,7 +139,7 @@ def simulation_var_x0_fixed_iterations(df_recipe, df_available_lots, ub = 0.7, i
     constraints, bnd = constraints_bounds(df_recipe, df_available_lots, ub = ub)
     for iteration in range(iterations):
         x0 = np.random.randint(0, df_available_lots['LOT_AVAILABILITY_KG'], len(df_available_lots['COST_BRL_KG']))
-        simulation_var_x0_fx_iter[str(iteration)] = minimize_round(df_recipe, df_available_lots, constraints, bnd, x0 = x0, maxiter = model_maxiter), {'x0': x0} 
+        simulation_var_x0_fx_iter[str(iteration)] = minimize_round(df_recipe, df_available_lots, constraints, bnd, x0 = x0, maxiter = model_maxiter)
         logging.warning('Appended iteration %d', iteration)
 
     return simulation_var_x0_fx_iter
