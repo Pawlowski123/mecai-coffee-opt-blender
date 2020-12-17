@@ -127,7 +127,8 @@ def minimize_round(df_recipe, df_available_lots, constraints, bnd, x0, maxiter =
 
 def simulation_fixed_x0_var_iterations(df_recipe, df_available_lots, ub = 0.7, stop = 100, step = 10):
     simulation_fx_x0_var_iter = {}
-    x0 = np.random.randint(0, df_available_lots['LOT_AVAILABILITY_KG'], len(df_available_lots['COST_BRL_KG']))
+    x0 = np.random.randint(0, 100, len(df_available_lots['COST_BRL_KG']))
+    #x0 = np.random.randint(0, df_available_lots['LOT_AVAILABILITY_KG'], len(df_available_lots['COST_BRL_KG']))
     constraints, bnd = constraints_bounds(df_recipe, df_available_lots, ub = 0.7)
     for iteration in range(1, stop, step):
         simulation_fx_x0_var_iter[str(iteration)] = minimize_round(df_recipe, df_available_lots, constraints, bnd, x0 = x0, maxiter = iteration)
